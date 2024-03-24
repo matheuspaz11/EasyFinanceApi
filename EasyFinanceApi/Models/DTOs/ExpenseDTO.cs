@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using static EasyFinanceApi.Models.Enums.Enum;
 
 namespace EasyFinanceApi.Models.DTOs
 {
@@ -11,7 +12,7 @@ namespace EasyFinanceApi.Models.DTOs
         public long Value { get; set; }
 
         [JsonPropertyName("Type")]
-        public long Type { get; set; }
+        public ExpenseType Type { get; set; }
 
         [JsonPropertyName("Vencimento")]
         public int Maturity { get; set; }

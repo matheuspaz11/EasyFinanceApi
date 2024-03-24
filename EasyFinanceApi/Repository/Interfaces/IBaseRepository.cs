@@ -9,5 +9,7 @@
         public void Delete<T>(T entity) where T : class;
 
         Task<bool> SaveChangesAsync();
+
+        Task DisposeAsync();
     }
 }

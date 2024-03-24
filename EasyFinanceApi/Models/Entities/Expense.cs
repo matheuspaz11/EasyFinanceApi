@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using static EasyFinanceApi.Models.Enums.Enum;
 
 namespace EasyFinanceApi.Models.Entities
 {
@@ -8,12 +8,12 @@ namespace EasyFinanceApi.Models.Entities
 
         public long Value { get; set; }
 
-        public long Type { get; set; }
+        public ExpenseType Type { get; set; }
 
         public int Maturity { get; set; }
 
-        public long Status { get; set; }
+        public ExpenseStatus Status { get; set; }
 
-        public DateTime PaymentDate {  get; set; }
+        public DateTime? PaymentDate {  get; set; }
     }
 }

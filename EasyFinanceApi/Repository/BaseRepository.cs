@@ -31,5 +31,10 @@ namespace EasyFinanceApi.Repository
         {
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task DisposeAsync()
+        {
+            await _context.DisposeAsync();
+        }
     }
 }
