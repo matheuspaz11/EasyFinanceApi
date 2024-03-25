@@ -13,6 +13,10 @@ namespace EasyFinanceApi.Helpers
                 .ForMember(dest => dest.PaymentDate, opt => opt.Ignore());
 
             CreateMap<Expense, ExpenseDTO>();
+            CreateMap<Expense, GetExpenseDTO>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(scr => EnumHelper.GetEnumDescription(scr.Status)))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(scr => EnumHelper.GetEnumDescription(scr.Type)))
+                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate.Value.ToLocalTime().ToString("yyyy-MM-dd")));
         }
     }
 }
