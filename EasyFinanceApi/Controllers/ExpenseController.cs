@@ -62,15 +62,15 @@ namespace EasyFinanceApi.Controllers
         }
 
         [HttpDelete]
-        [Route("DeleteExpenseByDescription/{description}")]
-        public async Task<IActionResult> DeleteExpenseByDescription(string description)
+        [Route("DeleteExpense/{description}")]
+        public async Task<IActionResult> DeleteExpense(string description)
         {
             try
             {
                 if (string.IsNullOrEmpty(description))
                     return BadRequest("Informe a despesa para busca");
 
-                var expense = await _expenseRepository.GetExpenseByDescription(description);
+                Expense expense = await _expenseRepository.GetExpenseByDescription(description);
 
                 if (expense == null)
                     return BadRequest("Despesa não encontrada");
@@ -117,6 +117,45 @@ namespace EasyFinanceApi.Controllers
             {
                 _expenseRepository.DisposeAsync();
 
+                throw;
+            }
+        }
+
+        [HttpPut]
+        [Route("ChangeExpense")]
+        public async Task<IActionResult> ChangeExpense(ChangeExpenseDTO changeExpenseDTO)
+        {
+            try
+            {
+                if (changeExpenseDTO.Value == null && changeExpenseDTO.Type == null && changeExpenseDTO.Maturity == null)
+                    return BadRequest("É necessário informar o campo Valor, Tipo ou Vencimento");
+
+                var changeExpense = _mapper.Map<Expense>(changeExpenseDTO);
+
+                if (string.IsNullOrEmpty(changeExpense.Description))
+                    return BadRequest("O campo Description é obrigatório");
+
+                var modifiedExpense = await _expenseRepository.GetExpenseByDescription(changeExpense.Description);
+
+                if(modifiedExpense == null)
+                    return NotFound("Despesa não encontrada na base de dados");
+
+                if (changeExpenseDTO.Value != null)
+                    modifiedExpense.Value = changeExpense.Value;
+
+                if(changeExpenseDTO.Maturity != null)
+                    modifiedExpense.Maturity  = changeExpense.Maturity;
+
+                if(changeExpenseDTO.Type != null)
+                    modifiedExpense.Type = changeExpense.Type;
+
+                _expenseRepository.Update(modifiedExpense);
+
+                return await _expenseRepository.SaveChangesAsync() ? Ok("Despesa atualizada com sucesso!") : BadRequest("Houve um erro no sistema, tente novamente");
+
+            }
+            catch (Exception ex)
+            {
                 throw;
             }
         }
