@@ -3,6 +3,7 @@ using System;
 using EasyFinanceApi.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EasyFinanceApi.Migrations
 {
     [DbContext(typeof(EasyFinanceContext))]
-    partial class EasyFinanceContextModelSnapshot : ModelSnapshot
+    [Migration("20240329204019_adicionandoUserId")]
+    partial class adicionandoUserId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace EasyFinanceApi.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("CreationUserId")
+                    b.Property<int>("CreationUserId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
@@ -56,7 +59,7 @@ namespace EasyFinanceApi.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("UpdateUserId")
+                    b.Property<int>("UpdateUserId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Value")

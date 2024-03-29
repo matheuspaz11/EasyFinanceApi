@@ -1,4 +1,5 @@
 using EasyFinanceApi.Context;
+using EasyFinanceApi.Helpers.Util;
 using EasyFinanceApi.Repository;
 using EasyFinanceApi.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,17 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddDbContext<EasyFinanceContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("Connection"));
+});
+
+builder.WebHost.ConfigureServices(services =>
+{
+    var configuration = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+        .Build();
+
+    services.AddSingleton(new ConfigHelper(configuration));
+
+    services.AddControllers();
 });
 
 var app = builder.Build();

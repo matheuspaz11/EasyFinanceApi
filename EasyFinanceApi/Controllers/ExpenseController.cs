@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EasyFinanceApi.Helpers.Util;
 using EasyFinanceApi.Models.DTOs;
 using EasyFinanceApi.Models.Entities;
 using EasyFinanceApi.Repository.Interfaces;
@@ -13,11 +14,13 @@ namespace EasyFinanceApi.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IExpenseRepository _expenseRepository;
+        private readonly ConfigHelper _configHelper;
 
-        public ExpenseController(IMapper mapper, IExpenseRepository expenseRepository)
+        public ExpenseController(IMapper mapper, IExpenseRepository expenseRepository, ConfigHelper configHelper)
         {
             _mapper = mapper;
             _expenseRepository = expenseRepository;
+            _configHelper = configHelper;
         }
 
         [HttpPost]
@@ -28,6 +31,9 @@ namespace EasyFinanceApi.Controllers
             {
                 Expense newExpense = _mapper.Map<Expense>(expenseDTO);
 
+                newExpense.CreationDate = DateTime.Now.ToUniversalTime();
+                newExpense.CreationUserId = _configHelper.GetDefaultUserId();
+
                 _expenseRepository.Add(newExpense);
 
                 return await _expenseRepository.SaveChangesAsync() ? Ok("Despesa salva com sucesso!") : BadRequest("Houve um erro no sistema, tente novamente mais tarde!");
@@ -36,8 +42,7 @@ namespace EasyFinanceApi.Controllers
             {
                 _expenseRepository.DisposeAsync();
 
-                throw;
-            }
+                return BadRequest(ex.Message);            }
         }
 
         [HttpGet]
@@ -49,15 +54,20 @@ namespace EasyFinanceApi.Controllers
                 if (string.IsNullOrEmpty(description))
                     return BadRequest("Informe a despesa para busca");
 
-                var expense = await _expenseRepository.GetExpenseByDescription(description);
+                Expense expense = await _expenseRepository.GetExpenseByDescription(description);
+
+                if (expense == null)
+                    return BadRequest("Despesa não encontrada");
 
                 var expenseResponse = _mapper.Map<GetExpenseDTO>(expense);
 
-                return expenseResponse != null ? Ok(expenseResponse) : BadRequest("Despesa não foi encontrada");
+                return Ok(expenseResponse);
             }
             catch(Exception ex)
             {
-                throw;
+                _expenseRepository.DisposeAsync();
+
+                return BadRequest(ex.Message);
             }
         }
 
@@ -68,7 +78,7 @@ namespace EasyFinanceApi.Controllers
             try
             {
                 if (string.IsNullOrEmpty(description))
-                    return BadRequest("Informe a despesa para busca");
+                    return BadRequest("Informe a despesa para deletar");
 
                 Expense expense = await _expenseRepository.GetExpenseByDescription(description);
 
@@ -83,7 +93,7 @@ namespace EasyFinanceApi.Controllers
             {
                 _expenseRepository.DisposeAsync();
 
-                throw;
+                return BadRequest(ex.Message);
             }
         }
 
@@ -94,7 +104,7 @@ namespace EasyFinanceApi.Controllers
             try
             {
                 if (string.IsNullOrEmpty(description))
-                    return BadRequest("Informe a despesa para busca");
+                    return BadRequest("Informe a despesa para pagar");
 
                 var expense = await _expenseRepository.GetExpenseByDescription(description);
 
@@ -108,6 +118,8 @@ namespace EasyFinanceApi.Controllers
 
                 expenseUpdate.PaymentDate = DateTime.Now.ToUniversalTime();
                 expenseUpdate.Status = ExpenseStatus.Liquidated;
+                expenseUpdate.UpdateDate = DateTime.Now.ToUniversalTime();
+                expenseUpdate.UpdateUserId = _configHelper.GetDefaultUserId();
 
                 _expenseRepository.Update(expenseUpdate);
 
@@ -117,7 +129,7 @@ namespace EasyFinanceApi.Controllers
             {
                 _expenseRepository.DisposeAsync();
 
-                throw;
+                return BadRequest(ex.Message);
             }
         }
 
@@ -130,15 +142,18 @@ namespace EasyFinanceApi.Controllers
                 if (changeExpenseDTO.Value == null && changeExpenseDTO.Type == null && changeExpenseDTO.Maturity == null)
                     return BadRequest("É necessário informar o campo Valor, Tipo ou Vencimento");
 
-                var changeExpense = _mapper.Map<Expense>(changeExpenseDTO);
+                Expense changeExpense = _mapper.Map<Expense>(changeExpenseDTO);
 
                 if (string.IsNullOrEmpty(changeExpense.Description))
                     return BadRequest("O campo Description é obrigatório");
 
-                var modifiedExpense = await _expenseRepository.GetExpenseByDescription(changeExpense.Description);
+                Expense modifiedExpense = await _expenseRepository.GetExpenseByDescription(changeExpense.Description);
 
                 if(modifiedExpense == null)
                     return NotFound("Despesa não encontrada na base de dados");
+
+                if (modifiedExpense.Status.Equals(ExpenseStatus.Liquidated))
+                    return BadRequest("Não é possível alterar uma despesa já paga");
 
                 if (changeExpenseDTO.Value != null)
                     modifiedExpense.Value = changeExpense.Value;
@@ -149,6 +164,9 @@ namespace EasyFinanceApi.Controllers
                 if(changeExpenseDTO.Type != null)
                     modifiedExpense.Type = changeExpense.Type;
 
+                modifiedExpense.UpdateDate = DateTime.Now.ToUniversalTime();
+                modifiedExpense.UpdateUserId = _configHelper.GetDefaultUserId();
+
                 _expenseRepository.Update(modifiedExpense);
 
                 return await _expenseRepository.SaveChangesAsync() ? Ok("Despesa atualizada com sucesso!") : BadRequest("Houve um erro no sistema, tente novamente");
@@ -156,7 +174,9 @@ namespace EasyFinanceApi.Controllers
             }
             catch (Exception ex)
             {
-                throw;
+                _expenseRepository.DisposeAsync();
+
+                return BadRequest(ex.Message);
             }
         }
     }

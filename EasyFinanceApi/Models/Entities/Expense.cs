@@ -6,7 +6,7 @@ namespace EasyFinanceApi.Models.Entities
     {
         public string Description { get; set; }
 
-        public long Value { get; set; }
+        public decimal Value { get; set; }
 
         public ExpenseType Type { get; set; }
 

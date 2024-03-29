@@ -4,16 +4,16 @@ namespace EasyFinanceApi.Models.DTOs
 {
     public class GetExpenseDTO
     {
-        [JsonPropertyName("Descrição")]
+        [JsonPropertyName("Description")]
         public string Description { get; set; }
 
-        [JsonPropertyName("Valor")]
-        public long Value { get; set; }
+        [JsonPropertyName("Value")]
+        public decimal Value { get; set; }
 
-        [JsonPropertyName("Tipo")]
+        [JsonPropertyName("Type")]
         public string Type { get; set; }
 
-        [JsonPropertyName("Vencimento")]
+        [JsonPropertyName("Maturity")]
         public int Maturity { get; set; }
 
         [JsonPropertyName("Status")]
@@ -21,5 +21,11 @@ namespace EasyFinanceApi.Models.DTOs
 
         [JsonPropertyName("PaymentDate")]
         public DateTime? PaymentDate { get; set; }
+
+        [JsonPropertyName("CreationDate")]
+        public DateTime? CreationDate { get; set; }
+
+        [JsonPropertyName("UpdateDate")]
+        public DateTime? UpdateDate { get; set; }
     }
 }
