@@ -2,6 +2,7 @@ using EasyFinanceApi.Context;
 using EasyFinanceApi.Helpers.Util;
 using EasyFinanceApi.Repository;
 using EasyFinanceApi.Repository.Interfaces;
+using EasyFinanceApi.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IBaseRepository, BaseRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<ExpenseService>();
 
 builder.Services.AddDbContext<EasyFinanceContext>(options =>
 {
