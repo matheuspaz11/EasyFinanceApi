@@ -1,6 +1,6 @@
 ﻿using EasyFinanceApi.Models.Entities;
 using EasyFinanceApi.Repository.Interfaces;
-using EasyFinanceApi.Services.Interfaces.IExpenseService;
+using EasyFinanceApi.Services.Interfaces;
 using static EasyFinanceApi.Models.Enums.Enum;
 
 namespace EasyFinanceApi.Services

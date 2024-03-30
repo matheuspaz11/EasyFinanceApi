@@ -1,7 +1,7 @@
 ﻿using EasyFinanceApi.Models.Entities;
 using EasyFinanceApi.Repository.Interfaces;
 
-namespace EasyFinanceApi.Services.Interfaces.IExpenseService
+namespace EasyFinanceApi.Services.Interfaces
 {
     public interface IExpenseService
     {
