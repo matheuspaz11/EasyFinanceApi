@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using EasyFinanceApi.Helpers.Validators;
+using System.Text.Json.Serialization;
 using static EasyFinanceApi.Models.Enums.Enum;
 
 namespace EasyFinanceApi.Models.DTOs
@@ -6,6 +7,7 @@ namespace EasyFinanceApi.Models.DTOs
     public class ExpenseDTO
     {
         [JsonPropertyName("Description")]
+        [StringValidate]
         public string Description { get; set; }
 
         [JsonPropertyName("Value")]

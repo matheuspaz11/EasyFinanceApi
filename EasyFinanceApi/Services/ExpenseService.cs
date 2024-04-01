@@ -7,21 +7,34 @@ namespace EasyFinanceApi.Services
 {
     public class ExpenseService : IExpenseService
     {
-        public async Task<Expense> ValidateExpenseExists(string description, IExpenseRepository expenseRepository)
+        public async Task<Expense> ValidateExpenseExists(string description, IExpenseRepository expenseRepository, bool createNewExpense)
         {
             if (string.IsNullOrEmpty(description))
                 throw new Exception("O campo Description é obrigatório");
 
+            description = description.ToLower();
+
             Expense expense = await expenseRepository.GetExpenseByDescription(description);
 
-            if (expense == null)
-                throw new Exception("Despesa não encontrada na base de dados");
+            if (createNewExpense)
+            {
+                if (expense != null)
+                    throw new Exception("Despesa já existe");
+                else
+                    return expense;
+            }
             else
-                return expense;
+            {
+                if (expense == null)
+                    throw new Exception("Despesa não encontrada na base de dados");
+                else
+                    return expense;
+            }
         }
 
         public void CreateNewExpense(Expense expense, IExpenseRepository expenseRepository, int userId)
         {
+            expense.Description = expense.Description.ToLower();
             expense.CreationDate = DateTime.Now.ToUniversalTime();
             expense.CreationUserId = userId;
 

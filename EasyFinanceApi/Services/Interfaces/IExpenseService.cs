@@ -5,7 +5,7 @@ namespace EasyFinanceApi.Services.Interfaces
 {
     public interface IExpenseService
     {
-        Task<Expense> ValidateExpenseExists(string description, IExpenseRepository expenseRepository);
+        Task<Expense> ValidateExpenseExists(string description, IExpenseRepository expenseRepository, bool createNewExpense);
 
         void CreateNewExpense(Expense expense, IExpenseRepository expenseRepository, int userId);
 

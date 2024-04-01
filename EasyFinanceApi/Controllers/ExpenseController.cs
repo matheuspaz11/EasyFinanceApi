@@ -33,15 +33,32 @@ namespace EasyFinanceApi.Controllers
             {
                 Expense newExpense = _mapper.Map<Expense>(expenseDTO);
 
+                await _expenseService.ValidateExpenseExists(newExpense.Description, _expenseRepository, true);
+
                 _expenseService.CreateNewExpense(newExpense, _expenseRepository, _configHelper.GetDefaultUserId());
 
-                return await _expenseRepository.SaveChangesAsync() ? Ok("Despesa salva com sucesso!") : BadRequest("Houve um erro no sistema, tente novamente mais tarde!");
+                object result;
+        
+                if (await _expenseRepository.SaveChangesAsync())
+                {
+                    result = new { success = true, message = "Despesa salva com sucesso!" };
+
+                    return StatusCode(200, result);
+                }
+                else
+                {
+                    result = new { success = true, message = "Houve um erro no sistema, tente novamente mais tarde!" };
+
+                    return StatusCode(500, result);
+                }
             }
             catch (Exception ex)
             {
                 await _expenseRepository.DisposeAsync();
 
-                return BadRequest(ex.Message);
+                object result = new { Success = false, Message = ex.Message };
+
+                return StatusCode(400, result);
             }
         }
 
@@ -51,15 +68,19 @@ namespace EasyFinanceApi.Controllers
         {
             try
             {
-                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository);
+                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository, false);
 
                 GetExpenseDTO expenseResponse = _mapper.Map<GetExpenseDTO>(expense);
+
+                object result = new { Success = true,  Expense = expenseResponse };
                 
-                return Ok(expenseResponse);
+                return StatusCode(200, result);
             }
             catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                object result = new { Success = false, Message =  ex.Message};
+
+                return StatusCode(400, result);
             }
         }
 
@@ -69,7 +90,7 @@ namespace EasyFinanceApi.Controllers
         {
             try
             {
-                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository);
+                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository, false);
 
                 _expenseService.DeleteExpenseByDescription(expense, _expenseRepository);
 
@@ -89,7 +110,7 @@ namespace EasyFinanceApi.Controllers
         {
             try
             {
-                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository);
+                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository, false);
 
                 _expenseService.PayExpense(expense, _expenseRepository, _configHelper.GetDefaultUserId());
 
@@ -109,7 +130,7 @@ namespace EasyFinanceApi.Controllers
         {
             try
             {
-                Expense expense = await _expenseService.ValidateExpenseExists(changeExpenseDTO.Description, _expenseRepository);
+                Expense expense = await _expenseService.ValidateExpenseExists(changeExpenseDTO.Description, _expenseRepository, false);
 
                 if (changeExpenseDTO.Value == null && changeExpenseDTO.Type == null && changeExpenseDTO.Maturity == null)
                     return BadRequest("É necessário informar o campo Value, Type ou Maturity");
