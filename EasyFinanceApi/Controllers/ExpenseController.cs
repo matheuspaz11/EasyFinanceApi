@@ -94,13 +94,30 @@ namespace EasyFinanceApi.Controllers
 
                 _expenseService.DeleteExpenseByDescription(expense, _expenseRepository);
 
-                return await _expenseRepository.SaveChangesAsync() ? Ok("Despesa deletada com sucesso!") : BadRequest("Não foi possível deletar a despesa");
+                object result;
+
+                if (await _expenseRepository.SaveChangesAsync())
+                {
+                    result = new { Success = true, Message = "Despesa deletada com sucesso!" };
+
+                    return StatusCode(200, result);
+                }
+                else
+                {
+                    result = new { Success = false, Message = "Não foi possível deletar a despesa" };
+
+                    return StatusCode(500, result);
+                }
+
+               
             }
             catch (Exception ex)
             {
                 await _expenseRepository.DisposeAsync();
 
-                return BadRequest(ex.Message);
+                object result = new { Success = false, Message = ex.Message };
+
+                return StatusCode(400, result);
             }
         }
 
@@ -114,13 +131,28 @@ namespace EasyFinanceApi.Controllers
 
                 _expenseService.PayExpense(expense, _expenseRepository, _configHelper.GetDefaultUserId());
 
-                return await _expenseRepository.SaveChangesAsync() ? Ok("Despesa foi atualizada como paga!") : BadRequest("Não foi possível atualizar despesa");
+                object result;
+
+                if (await _expenseRepository.SaveChangesAsync())
+                {
+                    result = new { Success = true, Message = "Despesa atualizada como paga!" };
+
+                    return StatusCode(200, result);
+                }
+                else
+                {
+                    result = new { Success = false, Message = "Não foi possível atualizar despesa" };
+
+                    return StatusCode (500, result);
+                }
             }
             catch (Exception ex)
             {
                 await _expenseRepository.DisposeAsync();
 
-                return BadRequest(ex.Message);
+                object result = new { Success = false, Message = ex.Message };
+
+                return StatusCode(400, result);
             }
         }
 
@@ -139,13 +171,28 @@ namespace EasyFinanceApi.Controllers
 
                 _expenseService.ChangeExpense(expense, changeExpense, _expenseRepository, _configHelper.GetDefaultUserId());
 
-                return await _expenseRepository.SaveChangesAsync() ? Ok("Despesa atualizada com sucesso!") : BadRequest("Houve um erro no sistema, tente novamente");
+                object result;
+
+                if (await _expenseRepository.SaveChangesAsync())
+                {
+                    result = new { Success = true, Message = "Despesa atualizada com sucesso!" };
+
+                    return StatusCode(200, result);
+                }
+                else
+                {
+                    result = new { Success = false, Message = "Houve um erro no sistema, tente novamente" };
+
+                    return StatusCode(500, result);
+                }
             }
             catch (Exception ex)
             {
                 await _expenseRepository.DisposeAsync();
 
-                return BadRequest(ex.Message);
+                object result = new { Success = false, Message = ex.Message };
+
+                return StatusCode(400, result);
             }
         }
     }
