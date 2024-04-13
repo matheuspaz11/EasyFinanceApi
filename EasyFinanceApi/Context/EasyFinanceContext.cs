@@ -9,6 +9,8 @@ namespace EasyFinanceApi.Context
 
         public DbSet<Expense> Expenses { get; set; }
 
+        public DbSet<Objective> Objectives { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
