@@ -16,7 +16,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IBaseRepository, BaseRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IObjectiveRepository, ObjectiveRepository>();
 builder.Services.AddScoped<ExpenseService>();
+builder.Services.AddScoped<ObjectiveService>();
 
 builder.Services.AddDbContext<EasyFinanceContext>(options =>
 {

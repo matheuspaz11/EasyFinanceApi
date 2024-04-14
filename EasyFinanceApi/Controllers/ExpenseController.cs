@@ -108,8 +108,6 @@ namespace EasyFinanceApi.Controllers
 
                     return StatusCode(500, result);
                 }
-
-               
             }
             catch (Exception ex)
             {

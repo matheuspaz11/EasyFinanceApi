@@ -21,6 +21,9 @@ namespace EasyFinanceApi.Helpers
             CreateMap<Expense, ChangeExpenseDTO>();
             CreateMap<ChangeExpenseDTO, Expense>();
             CreateMap<GetExpenseDTO, Expense>();
+            CreateMap<Objective, ObjectiveDTO>();
+            CreateMap<ObjectiveDTO, Objective>();
+            CreateMap<Objective, GetObjectiveDTO>();
         }
     }
 }
