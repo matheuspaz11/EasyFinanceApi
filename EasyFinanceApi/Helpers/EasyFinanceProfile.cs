@@ -23,6 +23,7 @@ namespace EasyFinanceApi.Helpers
             CreateMap<GetExpenseDTO, Expense>();
             CreateMap<Objective, ObjectiveDTO>();
             CreateMap<ObjectiveDTO, Objective>();
+            CreateMap<Objective, GetObjectiveDTO>();
         }
     }
 }

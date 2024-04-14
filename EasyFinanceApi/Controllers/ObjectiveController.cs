@@ -31,9 +31,11 @@ namespace EasyFinanceApi.Controllers
         {
             try
             {
-                Objective objective = _mapper.Map<Objective>(objectiveDTO);
+                Objective newObjective = _mapper.Map<Objective>(objectiveDTO);
 
-                _objectiveService.CreateObjective(objective, _objectiveRepository, _configHelper.GetDefaultUserId());
+                await _objectiveService.ValidateObjectiveExistsAsync(newObjective.Description, _objectiveRepository, true);
+
+                _objectiveService.CreateObjective(newObjective, _objectiveRepository, _configHelper.GetDefaultUserId());
 
                 object result;
 
@@ -55,6 +57,63 @@ namespace EasyFinanceApi.Controllers
                 object result = new { Success = false, Message = ex.Message };
 
                 return StatusCode(500, result);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetObjective/{description}")]
+        public async Task<IActionResult> GetObjective(string description)
+        {
+            try
+            {
+                Objective objective = await _objectiveService.ValidateObjectiveExistsAsync(description, _objectiveRepository, false);
+
+                GetObjectiveDTO getObjectiveDTO = _mapper.Map<GetObjectiveDTO>(objective);
+
+                object result = new { Success = true, Objective = getObjectiveDTO };
+
+                return StatusCode(200, result);
+            }
+            catch (Exception ex)
+            {
+                object result = new { Success = false, Message = ex.Message };
+
+                return StatusCode(400, result);
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteObjective/{description}")]
+        public async Task<IActionResult> DeleteObjective(string description)
+        {
+            try
+            {
+                Objective objective = await _objectiveService.ValidateObjectiveExistsAsync(description, _objectiveRepository, false);
+
+                _objectiveService.DeleteObjectiveByDescription(objective, _objectiveRepository);
+
+                object result;
+
+                if (await _objectiveRepository.SaveChangesAsync())
+                {
+                    result = new { Success = true, Message = "Objetivo deletado com sucesso!" };
+
+                    return StatusCode(200, result);
+                }
+                else
+                {
+                    result = new { Success = false, Message = "Não foi possível deletar o objetivo" };
+
+                    return StatusCode(500, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _objectiveRepository.DisposeAsync();
+
+                object result = new { Success = false, Message = ex.Message};
+
+                return StatusCode(400, result);
             }
         }
     }

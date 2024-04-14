@@ -1,6 +1,7 @@
 ﻿using EasyFinanceApi.Context;
 using EasyFinanceApi.Models.Entities;
 using EasyFinanceApi.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace EasyFinanceApi.Repository
 {
@@ -13,9 +14,9 @@ namespace EasyFinanceApi.Repository
             _context = context;
         }
 
-        public Task<Objective> GetObjectiveByDescription(string description)
+        public async Task<Objective> GetObjectiveByDescription(string description)
         {
-            throw new NotImplementedException();
+            return await _context.Objectives.Where(x => x.Description == description).FirstOrDefaultAsync();
         }
     }
 }

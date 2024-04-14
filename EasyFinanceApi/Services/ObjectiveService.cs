@@ -26,5 +26,35 @@ namespace EasyFinanceApi.Services
 
             return (int)Math.Round(monthsToObjective, MidpointRounding.AwayFromZero);
         }
+
+        public async Task<Objective> ValidateObjectiveExistsAsync(string description, IObjectiveRepository objectiveRepository, bool createNewObjective)
+        {
+            if(string.IsNullOrEmpty(description))
+                throw new Exception("Objetivo não encontrado na base de dados");
+
+            description = description.ToLower();
+
+            Objective objective = await objectiveRepository.GetObjectiveByDescription(description);
+
+            if (createNewObjective)
+            {
+                if (objective != null)
+                    throw new Exception("Objetivo já existe na base de dados");
+                else
+                    return objective;
+            }
+            else
+            {
+                if (objective == null)
+                    throw new Exception("Objetivo não encontrado na base de dados");
+                else
+                    return objective;
+            }
+        }
+
+        public void DeleteObjectiveByDescription(Objective objective, IObjectiveRepository objectiveRepository)
+        {
+            objectiveRepository.Delete(objective);
+        }
     }
 }
