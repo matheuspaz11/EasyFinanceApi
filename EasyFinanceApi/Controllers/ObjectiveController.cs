@@ -49,7 +49,7 @@ namespace EasyFinanceApi.Controllers
                 {
                     result = new { Success = false, Message = "Houve um erro no sistema, tente novamente mais tarde" };
 
-                    return StatusCode(500, result);
+                    return StatusCode(400, result);
                 }
             }
             catch(Exception ex) 
@@ -78,7 +78,7 @@ namespace EasyFinanceApi.Controllers
             {
                 object result = new { Success = false, Message = ex.Message };
 
-                return StatusCode(400, result);
+                return StatusCode(500, result);
             }
         }
 
@@ -104,7 +104,7 @@ namespace EasyFinanceApi.Controllers
                 {
                     result = new { Success = false, Message = "Não foi possível deletar o objetivo" };
 
-                    return StatusCode(500, result);
+                    return StatusCode(400, result);
                 }
             }
             catch (Exception ex)
@@ -113,7 +113,40 @@ namespace EasyFinanceApi.Controllers
 
                 object result = new { Success = false, Message = ex.Message};
 
-                return StatusCode(400, result);
+                return StatusCode(500, result);
+            }
+        }
+
+        [HttpPatch]
+        [Route("ApplyValueToObjective")]
+        public async Task<IActionResult> ApplyValue(ApplyValueToObjectiveDTO applyValueToObjectiveDTO)
+        {
+            try
+            {
+                Objective objective = await _objectiveService.ValidateObjectiveExistsAsync(applyValueToObjectiveDTO.Description, _objectiveRepository, false);
+
+                _objectiveService.ApplyValueToObjective(objective, applyValueToObjectiveDTO.Value, _objectiveRepository, _configHelper.GetDefaultUserId());
+
+                object result;
+
+                if (await _objectiveRepository.SaveChangesAsync())
+                {
+                    result = new { Success = true, Message = "Valor aplicado com sucesso!" };
+
+                    return StatusCode(200, result);
+                }
+                else
+                {
+                    result = new { Success = false, Message = "Não foi possível aplicar o valor!" };
+
+                    return StatusCode(400, result);
+                }
+            }
+            catch(Exception ex)
+            {
+                object result = new { Success = false, Message = ex.Message};
+
+                return StatusCode(500, result);
             }
         }
     }

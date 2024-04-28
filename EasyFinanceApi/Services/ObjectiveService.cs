@@ -56,5 +56,23 @@ namespace EasyFinanceApi.Services
         {
             objectiveRepository.Delete(objective);
         }
+
+        public void ApplyValueToObjective(Objective objective, decimal value, IObjectiveRepository objectiveRepository, int userId)
+        {
+            string currentValue = objective.CurrentValue.ToString().Replace(",", "");
+
+            decimal newCurrentValue = Convert.ToDecimal(currentValue) + value;
+
+            objective.CurrentValue = Convert.ToDecimal(newCurrentValue);
+            objective.LastEntry = value;
+
+            int monthsToObjective = ReturnMonthsToObjective(objective);
+
+            objective.MonthsToObjective = monthsToObjective;
+            objective.UpdateDate = DateTime.Now;
+            objective.UpdateUserId = userId;
+
+            objectiveRepository.Update(objective);
+        }
     }
 }
