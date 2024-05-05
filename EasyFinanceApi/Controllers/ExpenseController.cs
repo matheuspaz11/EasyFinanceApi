@@ -64,7 +64,7 @@ namespace EasyFinanceApi.Controllers
 
         [HttpGet]
         [Route("GetExpense/{description}")]
-        public async Task<IActionResult> GetExpense(string description)
+        public async Task<IActionResult> GetExpenseByDescription(string description)
         {
             try
             {
@@ -189,6 +189,28 @@ namespace EasyFinanceApi.Controllers
                 await _expenseRepository.DisposeAsync();
 
                 object result = new { Success = false, Message = ex.Message };
+
+                return StatusCode(400, result);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetExpenses")]
+        public async Task<IActionResult> GetExpenses()
+        {
+            object result;
+
+            try
+            {
+                var expenses = await _expenseService.GetExpenses(_expenseRepository);
+
+                result = new { Success = true, Result = expenses };
+
+                return StatusCode(200, result);
+            }
+            catch (Exception ex)
+            {
+                result = new { Success = false, Message = ex.Message };
 
                 return StatusCode(400, result);
             }

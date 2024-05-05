@@ -25,6 +25,14 @@ builder.Services.AddDbContext<EasyFinanceContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Connection"));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("EasyFinanceWeb", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
 builder.WebHost.ConfigureServices(services =>
 {
     var configuration = new ConfigurationBuilder()
@@ -44,6 +52,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("EasyFinanceWeb");
 
 app.UseHttpsRedirection();
 

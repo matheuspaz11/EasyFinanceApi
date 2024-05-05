@@ -1,4 +1,5 @@
-﻿using EasyFinanceApi.Models.Entities;
+﻿using EasyFinanceApi.Models.DTOs;
+using EasyFinanceApi.Models.Entities;
 using EasyFinanceApi.Repository.Interfaces;
 using EasyFinanceApi.Services.Interfaces;
 using static EasyFinanceApi.Models.Enums.Enum;
@@ -96,5 +97,15 @@ namespace EasyFinanceApi.Services
 
             expenseRepository.Update(expense);
         }
+
+        public async Task<IEnumerable<ExpenseDTO>> GetExpenses(IExpenseRepository expenseRepository)
+        {
+            var expenses = await expenseRepository.GetExpenses();
+
+            if (!expenses.Any())
+                throw new Exception("Não existe despesas cadastradas na base de dados");
+            else
+                return expenses;
+        } 
     }
 }
