@@ -7,6 +7,8 @@ namespace EasyFinanceApi.Repository.Interfaces
     {
         Task<Expense> GetExpenseByDescription (string description);
 
-        Task<IEnumerable<ExpenseDTO>> GetExpenses();
+        Task<IEnumerable<GetExpenseDTO>> GetExpenses();
+
+        Task<Expense> GetExpenseById(int? id);
     }
 }

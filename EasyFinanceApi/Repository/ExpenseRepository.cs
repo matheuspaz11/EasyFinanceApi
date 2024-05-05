@@ -20,19 +20,29 @@ namespace EasyFinanceApi.Repository
             return await _context.Expenses.Where(x => x.Description == description).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<ExpenseDTO>> GetExpenses()
+        public async Task<IEnumerable<GetExpenseDTO>> GetExpenses()
         {
             List<Expense> expenses = await _context.Expenses.ToListAsync();
 
-            var expensesDTO = expenses.Select(e => new ExpenseDTO
+            var expensesDTO = expenses.Select(e => new GetExpenseDTO
             {
+                Id = e.Id,
                 Description = e.Description,
                 Value = e.Value,
-                Type = e.Type,
-                Maturity = e.Maturity
+                Type = e.Type.ToString(),
+                Maturity = e.Maturity,
+                Status = e.Status.ToString(),
+                PaymentDate = e.PaymentDate,
+                CreationDate = e.CreationDate,
+                UpdateDate = e.UpdateDate
             });
 
             return expensesDTO;
+        }
+
+        public async Task<Expense> GetExpenseById(int? id)
+        {
+            return await _context.Expenses.Where(x => x.Id == id).FirstOrDefaultAsync();
         }
     }
 }

@@ -8,24 +8,23 @@ namespace EasyFinanceApi.Services
 {
     public class ExpenseService : IExpenseService
     {
-        public async Task<Expense> ValidateExpenseExists(string description, IExpenseRepository expenseRepository, bool createNewExpense)
+        public async Task<Expense> ValidateExpenseExists(IExpenseRepository expenseRepository, bool createNewExpense, int? id, string? description)
         {
-            if (string.IsNullOrEmpty(description))
-                throw new Exception("O campo Description é obrigatório");
-
-            description = description.ToLower();
-
-            Expense expense = await expenseRepository.GetExpenseByDescription(description);
-
             if (createNewExpense)
             {
+                description = description.ToLower();
+
+                Expense expense = await expenseRepository.GetExpenseByDescription(description);
+
                 if (expense != null)
-                    throw new Exception("Despesa já existe");
+                    throw new Exception("Despesa já cadastrada na base de dados");
                 else
                     return expense;
             }
             else
             {
+                Expense expense = await expenseRepository.GetExpenseById(id);
+
                 if (expense == null)
                     throw new Exception("Despesa não encontrada na base de dados");
                 else
@@ -98,7 +97,7 @@ namespace EasyFinanceApi.Services
             expenseRepository.Update(expense);
         }
 
-        public async Task<IEnumerable<ExpenseDTO>> GetExpenses(IExpenseRepository expenseRepository)
+        public async Task<IEnumerable<GetExpenseDTO>> GetExpenses(IExpenseRepository expenseRepository)
         {
             var expenses = await expenseRepository.GetExpenses();
 
@@ -106,6 +105,16 @@ namespace EasyFinanceApi.Services
                 throw new Exception("Não existe despesas cadastradas na base de dados");
             else
                 return expenses;
-        } 
+        }
+
+        public async Task<Expense> GetExpenseById(int id, IExpenseRepository expenseRepository)
+        {
+            Expense expense = await expenseRepository.GetExpenseById(id);
+
+            if (expense == null)
+                throw new Exception("Não existe despesas cadastradas na base de dados");
+            else
+                return expense;
+        }
     }
 }

@@ -4,6 +4,9 @@ namespace EasyFinanceApi.Models.DTOs
 {
     public class GetExpenseDTO
     {
+        [JsonPropertyName("Id")]
+        public int Id { get; set; }
+
         [JsonPropertyName("Description")]
         public string Description { get; set; }
 

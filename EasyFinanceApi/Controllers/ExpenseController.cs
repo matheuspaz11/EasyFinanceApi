@@ -33,7 +33,7 @@ namespace EasyFinanceApi.Controllers
             {
                 Expense newExpense = _mapper.Map<Expense>(expenseDTO);
 
-                await _expenseService.ValidateExpenseExists(newExpense.Description, _expenseRepository, true);
+                await _expenseService.ValidateExpenseExists(_expenseRepository, true, null, newExpense.Description);
 
                 _expenseService.CreateNewExpense(newExpense, _expenseRepository, _configHelper.GetDefaultUserId());
 
@@ -41,7 +41,7 @@ namespace EasyFinanceApi.Controllers
         
                 if (await _expenseRepository.SaveChangesAsync())
                 {
-                    result = new { success = true, message = "Despesa salva com sucesso!" };
+                    result = new { success = true, message = "Despesa salva com sucesso!", expense = newExpense};
 
                     return StatusCode(200, result);
                 }
@@ -62,35 +62,13 @@ namespace EasyFinanceApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("GetExpense/{description}")]
-        public async Task<IActionResult> GetExpenseByDescription(string description)
-        {
-            try
-            {
-                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository, false);
-
-                GetExpenseDTO expenseResponse = _mapper.Map<GetExpenseDTO>(expense);
-
-                object result = new { Success = true,  Expense = expenseResponse };
-                
-                return StatusCode(200, result);
-            }
-            catch(Exception ex)
-            {
-                object result = new { Success = false, Message =  ex.Message};
-
-                return StatusCode(400, result);
-            }
-        }
-
         [HttpDelete]
-        [Route("DeleteExpense/{description}")]
-        public async Task<IActionResult> DeleteExpense(string description)
+        [Route("DeleteExpense/{id}")]
+        public async Task<IActionResult> DeleteExpense(int id)
         {
             try
             {
-                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository, false);
+                Expense expense = await _expenseService.ValidateExpenseExists(_expenseRepository, false, id, null);
 
                 _expenseService.DeleteExpenseByDescription(expense, _expenseRepository);
 
@@ -120,12 +98,12 @@ namespace EasyFinanceApi.Controllers
         }
 
         [HttpPatch]
-        [Route("PayExpense/{description}")]
-        public async Task<IActionResult> PayExpense(string description)
+        [Route("PayExpense/{id}")]
+        public async Task<IActionResult> PayExpense(int id)
         {
             try
             {
-                Expense expense = await _expenseService.ValidateExpenseExists(description, _expenseRepository, false);
+                Expense expense = await _expenseService.ValidateExpenseExists(_expenseRepository, false, id, null);
 
                 _expenseService.PayExpense(expense, _expenseRepository, _configHelper.GetDefaultUserId());
 
@@ -160,7 +138,7 @@ namespace EasyFinanceApi.Controllers
         {
             try
             {
-                Expense expense = await _expenseService.ValidateExpenseExists(changeExpenseDTO.Description, _expenseRepository, false);
+                Expense expense = await _expenseService.ValidateExpenseExists(_expenseRepository, false, null, changeExpenseDTO.Description);
 
                 if (changeExpenseDTO.Value == null && changeExpenseDTO.Type == null && changeExpenseDTO.Maturity == null)
                     return BadRequest("É necessário informar o campo Value, Type ou Maturity");
@@ -205,6 +183,28 @@ namespace EasyFinanceApi.Controllers
                 var expenses = await _expenseService.GetExpenses(_expenseRepository);
 
                 result = new { Success = true, Result = expenses };
+
+                return StatusCode(200, result);
+            }
+            catch (Exception ex)
+            {
+                result = new { Success = false, Message = ex.Message };
+
+                return StatusCode(400, result);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetExpense/{id}")]
+        public async Task<IActionResult> GetExpenseById(int id)
+        {
+            object result;
+
+            try
+            {
+                Expense expense = await _expenseService.GetExpenseById(id, _expenseRepository);
+
+                result = new { Success = true, Result = expense };
 
                 return StatusCode(200, result);
             }
